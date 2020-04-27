@@ -7,10 +7,10 @@ from helper import validate_args, get_ip_address_list, make_backup, make_connect
 
 def main():
     parser = argparse.ArgumentParser(description='DevNet Tool')
-    parser.add_argument('--user', type=str, required=False, help='Username')
-    parser.add_argument('--password', type=str, required=False, help='Password')
-    parser.add_argument('--network', type=str, required=False, help='Management Network')
-    parser.add_argument('--ntp-server', type=str, required=False, help='NTP server')
+    parser.add_argument('--user', type=str, required=True, help='Username')
+    parser.add_argument('--password', type=str, required=True, help='Password')
+    parser.add_argument('--network', type=str, required=True, help='Management Network')
+    parser.add_argument('--ntp-server', type=str, required=True, help='NTP server')
 
     args = parser.parse_args()
 
