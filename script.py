@@ -22,6 +22,7 @@ def main():
 
     for address in get_ip_address_list(args.network):
         print(f'connection started to {address}')
+
         connection = make_connection(address=address, user=args.user, password=args.password)
         if not connection:
             continue
@@ -33,23 +34,20 @@ def main():
         if bool(device_info) is False:
             print('show version parse failed')
             continue
-        print(device_info)
 
         make_backup(connection=connection, hostname=device_info['Hostname'], timestamp=timestamp)
 
         device_cdp_info = get_cdp_service_info(connection=connection, hostname=device_info['Hostname'])
-        print(device_cdp_info)
 
         time_config(
             connection=connection, hostname=device_info['Hostname'], ntp_server=args.ntp_server, timestamp=timestamp)
 
         ntp_service_info = get_ntp_service_info(connection=connection, hostname=device_info['Hostname'])
-        output_report += make_report(device_info=device_info, cdp_info=device_cdp_info, ntp_info=ntp_service_info)
-
         close_connection(connection=connection)
 
-    print(output_report)
+        output_report += make_report(device_info=device_info, cdp_info=device_cdp_info, ntp_info=ntp_service_info)
 
+    print(output_report)
 
 
 if __name__ == "__main__":

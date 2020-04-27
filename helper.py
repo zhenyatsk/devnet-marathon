@@ -179,9 +179,9 @@ def time_config(connection, hostname: str, ntp_server: str, timestamp: str):
             matches = re.search(r"^Success\s+rate\s+is\s+(?P<Rate>\d+)\s+percent.+$", output, re.MULTILINE)
             if matches:
                 if int(matches.group('Rate')) > 0:
-                    print('ntp server reachable')
+                    print(f'ntp server reachable from {hostname}')
                 else:
-                    print('ntp server not reachable')
+                    print(f'ntp server not reachable from {hostname}')
                     keys_to_config.remove('ntp')
         except Exception:
             print(f'Failed to check reachibility of ntp server on {hostname}')
@@ -190,9 +190,10 @@ def time_config(connection, hostname: str, ntp_server: str, timestamp: str):
     if len(keys_to_config):
         command_list = [config_lines[item] for item in keys_to_config]
         print(command_list)
+        #just for test,
         #connection.send_config_set(command_list)
     else:
-        print('nothing to config')
+        print(f'nothing to change in config on {hostname}')
 
 
 def make_report(device_info, cdp_info, ntp_info):
