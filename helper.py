@@ -50,13 +50,13 @@ def make_connection(address: str, user: str, password: str):
         'username': user,
         'password': password
     }
-#     connection_params = {
-#         'device_type': 'cisco_ios',
-#         'ip': '64.103.37.51',
-#         'username': 'developer',
-#         'password': 'C1sco12345',
-#         'port': 8181
-#     }
+    # connection_params = {
+    #     'device_type': 'cisco_ios',
+    #     'ip': '64.103.37.51',
+    #     'username': 'developer',
+    #     'password': 'C1sco12345',
+    #     'port': 8181
+    # }
     try:
         return ConnectHandler(**connection_params)
     except:
@@ -189,8 +189,8 @@ def time_config(connection, hostname: str, ntp_server: str, timestamp: str):
     print('config options')
     if len(keys_to_config):
         command_list = [config_lines[item] for item in keys_to_config]
-        print(command_list)
-        #just for test,
+        print(f'need to execute commands: {command_list}')
+        #just for test
         #connection.send_config_set(command_list)
     else:
         print(f'nothing to change in config on {hostname}')
