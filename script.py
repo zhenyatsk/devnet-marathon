@@ -1,8 +1,8 @@
 import argparse
-import datetime
 
-from helper import validate_args, get_ip_address_list, make_backup, make_connection, parse_show_version, \
-    get_cdp_service_info, time_config, make_report, get_ntp_service_info, close_connection
+from utils import validate_args, get_ip_address_list, make_connection, close_connection
+from tasks import make_backup, config_timezone_ntp, make_report
+from parsers import parse_show_version, parse_cdp_neighbor_detail, parse_ntp_status
 
 
 def main():
@@ -16,9 +16,7 @@ def main():
 
     validate_args(args)
 
-    timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
-
-    output_report = "----SUMMARY----\n"
+    output_report = ''
 
     for address in get_ip_address_list(args.network):
         print(f'connection started to {address}')
@@ -32,22 +30,28 @@ def main():
 
         device_info = parse_show_version(connection=connection)
         if bool(device_info) is False:
-            print('show version parse failed')
+            print('show version parse failed, skip')
             continue
 
-        make_backup(connection=connection, hostname=device_info['Hostname'], timestamp=timestamp)
+        config = make_backup(connection=connection, hostname=device_info['Hostname'])
+        if not config:
+            print('failed to get config, skip')
+            continue
 
-        device_cdp_info = get_cdp_service_info(connection=connection, hostname=device_info['Hostname'])
+        device_cdp_info = parse_cdp_neighbor_detail(connection=connection, hostname=device_info['Hostname'])
 
-        time_config(
-            connection=connection, hostname=device_info['Hostname'], ntp_server=args.ntp_server, timestamp=timestamp)
+        config_timezone_ntp(
+            connection=connection, hostname=device_info['Hostname'], ntp_server=args.ntp_server, config=config)
 
-        ntp_service_info = get_ntp_service_info(connection=connection, hostname=device_info['Hostname'])
+        ntp_service_info = parse_ntp_status(connection=connection, hostname=device_info['Hostname'])
+
         close_connection(connection=connection)
 
         output_report += make_report(device_info=device_info, cdp_info=device_cdp_info, ntp_info=ntp_service_info)
 
-    print(output_report)
+    if output_report:
+        print('----SUMMARY----\n')
+        print(output_report)
 
 
 if __name__ == "__main__":
